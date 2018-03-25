@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Infokaaos Haku</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+     <script type="text/javascript" src="vis.js"></script>
+     <link href="vis-network.min.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Infokaaos Haku by DCC</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li><a href="/">Home</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div style="margin: 20px;">
+    <h1>Infokaaos Haku</h1>
+
+    <form class="form-inline">
+        <input type="text" class="form-control" id="search_word" placeholder="Enter search word">
+        <button type="button" class="btn btn-primary" id="submit">Search</button>
+    </form>
+</div>
+
+</body>
+
+<script>
+$( document ).ready(function() {
+    $( "#submit" ).click(function() {
+        search_word1 = $( "#search_word" ).val();
+        $.post( "/search", { search_word: search_word1})
+            .done(function( data ) {
+            alert(data);
+            location.reload();
+        });
+    });
+});
+</script>
+</html>
