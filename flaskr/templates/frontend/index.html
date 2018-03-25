@@ -23,25 +23,93 @@
   </div>
 </nav>
 
-<div style="margin: 20px;">
+<div style="margin-left: 10px;">
     <h1>Infokaaos Haku</h1>
 
     <form class="form-inline">
         <input type="text" class="form-control" id="search_word" placeholder="Enter search word">
         <button type="button" class="btn btn-primary" id="submit">Search</button>
     </form>
+
+    <div id="media_information">
+
+    </div>
+    <div id="classes">
+
+    </div>
+    <button type="button" class="btn btn-lg btn-primary" id="show_links" style="display:none;">Download article links</button>
+    <button type="button" class="btn btn-lg btn-primary" id="download_domains" style="display:none;">Download link domains</button>
+    <div id="links">
+
+    </div>
 </div>
 
 </body>
 
 <script>
+
+function saveTextAsFile(links, filename)
+{
+    var textToWrite = links;
+    var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+    var fileNameToSaveAs = filename;
+      var downloadLink = document.createElement("a");
+    downloadLink.download = fileNameToSaveAs;
+    downloadLink.innerHTML = "Download File";
+    if (window.webkitURL != null)
+    {
+        // Chrome allows the link to be clicked
+        // without actually adding it to the DOM.
+        downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+    }
+    else
+    {
+        // Firefox requires the link to be added to the DOM
+        // before it can be clicked.
+        downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+        downloadLink.onclick = destroyClickedElement;
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+    }
+
+    downloadLink.click();
+}
+
+function place_media_counts(media_counts){
+    returni = "<h3> Article counts per media with this search word </h3>";
+    media_counts = media_counts.split(",");
+    medias = ["mvlehti.net", "nykysuomi.com", "finleaks.org", "uutismaailma.com", "vastavalkea.fi", "kansalainen.fi"];
+    for(i = 0;i<medias.length;i++){
+        returni += medias[i] + ": " + media_counts[i] + "\n";
+    }
+    $( "#media_information" ).html(returni);
+}
+
+function place_classes(classes){
+    returni = "<h3> Domain occurrences per class </h3>"
+    $( "#classes" ).html(returni + classes.replace("\"", ""));
+}
+
 $( document ).ready(function() {
     $( "#submit" ).click(function() {
         search_word1 = $( "#search_word" ).val();
         $.post( "/search", { search_word: search_word1})
             .done(function( data ) {
-            alert(data);
-            location.reload();
+            data = JSON.parse(data)
+            place_media_counts(data.media_counts);
+            place_classes(JSON.stringify(data.classes));
+            $( "#show_links" ).css("display", "");
+            $( "#download_domains" ).css("display", "");
+            //location.reload();
+
+             $( "#show_links" ).click(function() {
+                saveTextAsFile(data.links, "links.txt");
+             });
+
+             $( "#download_domains" ).click(function() {
+                saveTextAsFile(data.domains, "domains.json");
+             });
+
         });
     });
 });
