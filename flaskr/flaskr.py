@@ -80,7 +80,8 @@ def get_frequency_dict(domains):
 def get_class_dict(domain_dicti):
     class_dict = get_category_dict()
     class_freq_dict = {'not_found' : 0}
-    for key, value in domain_dicti.iteritems():
+    for key in sorted(domain_dicti.keys()):
+        value = domain_dicti[key]
         if key not in class_dict:
             class_freq_dict['not_found'] += value
             continue
@@ -89,6 +90,7 @@ def get_class_dict(domain_dicti):
             class_freq_dict[category] = class_freq_dict[category] + value
         else:
             class_freq_dict[category] = value
+    print(class_freq_dict)
     return class_freq_dict
 
 def get_media_counts(media_id_list):
@@ -103,15 +105,17 @@ def get_media_counts(media_id_list):
 
 def get_domain_string(domainit):
     returni = ""
-    for w in sorted(domainit, key=domainit.get, reverse=True):
+    for w in sorted(domainit.keys()):
         returni += w + "," + str(domainit[w]) + "\n"
     return returni
 
 def get_class_string(class_dict):
     returni = ""
-    for w in sorted(class_dict, key=class_dict.get, reverse=True):
+    all = ""
+    for w in sorted(class_dict.keys()):
         returni += w + "," + str(class_dict[w]) + "</br>"
-    return returni
+        all += str(class_dict[w]) + ","
+    return returni + all
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -123,10 +127,12 @@ def search():
     splitti = search_word.split(",")
     splitti_query = ""
     for i in range(1, len(splitti)):
+        if len(splitti[i]) < 2:
+            continue
         splitti_query += ' or content like "%' + splitti[i] + '%" '
-    query = 'select * from posts where content like "%'+ splitti[0] + '%"' + splitti_query + 'order by id desc'
+    query = 'select * from posts where content like "%'+ splitti[0] + '%"' + splitti_query + ' and media_id != 5 and not date like "%2018%" order by id desc'
     print(query)
-    cur = db.execute('select * from posts where content like "%'+ splitti[0] + '%"' + splitti_query + 'order by id desc')
+    cur = db.execute('select * from posts where content like "%'+ splitti[0] + '%"' + splitti_query + ' and media_id != 5 and not date like "%2018%" order by id desc')
     entries = cur.fetchall()
 
     list = []

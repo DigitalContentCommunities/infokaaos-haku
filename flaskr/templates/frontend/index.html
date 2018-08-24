@@ -26,8 +26,8 @@
 <div style="margin-left: 10px;">
     <h1>Infokaaos Haku</h1>
 
+    <input type="text" class="form-control" id="search_word" placeholder="Enter search word">
     <form class="form-inline">
-        <input type="text" class="form-control" id="search_word" placeholder="Enter search word">
         <button type="button" class="btn btn-primary" id="submit">Search</button>
     </form>
 
@@ -50,6 +50,7 @@
 
 function saveTextAsFile(links, filename)
 {
+    console.log("Hei");
     var textToWrite = links;
     var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
     var fileNameToSaveAs = filename;
@@ -91,6 +92,8 @@ function place_classes(classes){
 }
 
 $( document ).ready(function() {
+    var links = "";
+    var domains = "";
     $( "#submit" ).click(function() {
         search_word1 = $( "#search_word" ).val();
         $.post( "/search", { search_word: search_word1})
@@ -101,17 +104,17 @@ $( document ).ready(function() {
             $( "#show_links" ).css("display", "");
             $( "#download_domains" ).css("display", "");
             //location.reload();
-
-             $( "#show_links" ).click(function() {
-                saveTextAsFile(data.links, "links.txt");
-             });
-
-             $( "#download_domains" ).click(function() {
-                saveTextAsFile(data.domains, "domains.json");
-             });
-
+            links = data.links;
+            domains = data.domains;
         });
     });
+
+     $( "#show_links" ).click(function() {
+        saveTextAsFile(links, "links.txt");
+     });
+     $( "#download_domains" ).click(function() {
+        saveTextAsFile(domains, "domains.json");
+     });
 });
 </script>
 </html>
